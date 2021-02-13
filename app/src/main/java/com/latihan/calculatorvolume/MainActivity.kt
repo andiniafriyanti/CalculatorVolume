@@ -14,6 +14,12 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
     private lateinit var edtTinggi: EditText
     private lateinit var btnHitung: Button
     private lateinit var tvHasil: TextView
+
+
+    companion object {
+        private const val STATE_RESULT = "state_result"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -25,6 +31,15 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         tvHasil = findViewById(R.id.tv_hasil)
 
         btnHitung.setOnClickListener(this)
+        if (savedInstanceState != null) {
+            val result = savedInstanceState.getString(STATE_RESULT)
+            tvHasil.text = result
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_RESULT, tvHasil.text.toString())
     }
 
     override fun onClick(v: View) {
@@ -33,8 +48,27 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
             val inputLebar = edtLebar.text.toString().trim()
             val inputTinggi = edtTinggi.text.toString().trim()
 
-            val volume = inputLebar.toDouble() * inputPanjang.toDouble() * inputTinggi.toDouble()
-            tvHasil.text = volume.toString()
+            var isEmptyFields = false
+
+            when {
+                inputPanjang.isEmpty() -> {
+                    isEmptyFields = true
+                    edtPanjang.error = "Field ini tidak boleh kosong"
+                }
+                inputLebar.isEmpty() -> {
+                    isEmptyFields = true
+                    edtLebar.error = "Field ini tidak boleh kosong"
+                }
+                inputTinggi.isEmpty() -> {
+                    isEmptyFields = true
+                    edtTinggi.error = "Field ini tidak boleh kosong"
+                }
+            }
+
+            if (!isEmptyFields) {
+                val volume = inputLebar.toDouble() * inputPanjang.toDouble() * inputTinggi.toDouble()
+                tvHasil.text = volume.toString()
+            }
         }
     }
 }
